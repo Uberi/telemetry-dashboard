@@ -148,7 +148,8 @@ $(document)
     $(".permalink-control button")
       .click(function () {
         var $this = $(this);
-        var response = $.ajax({
+        var shortUrl = "ERROR";
+        $.ajax({
           url: "https://api-ssl.bitly.com/shorten",
           dataType: "jsonp",
           async: false, // this request needs to be synchronous in order to be able to use document.execCommand() later while still being in the click handler
@@ -157,15 +158,19 @@ $(document)
             access_token: "48ecf90304d70f30729abe82dfea1dd8a11c4584",
             format: "json"
           },
+          success: function (response) {
+            if (response.results !== null) {
+              var longUrl = Object.keys(response.results)[0];
+              shortUrl = response.results[longUrl].shortUrl;
+            }
+          },
         });
-        var longUrl = Object.keys(response.results)[0];
-        var shortUrl = response.results[longUrl].shortUrl;
         $this.parents(".permalink-control")
           .find("input")
           .show()
           .val(shortUrl)
           .focus();
-        document.execCommand("copy");
+        document.execCommand("copy"); // copy the selection to the clipboard
       });
   });
 
