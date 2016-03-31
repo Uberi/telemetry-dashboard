@@ -148,24 +148,24 @@ $(document)
     $(".permalink-control button")
       .click(function () {
         var $this = $(this);
-        $.ajax({
+        var response = $.ajax({
           url: "https://api-ssl.bitly.com/shorten",
           dataType: "jsonp",
+          async: false, // this request needs to be synchronous in order to be able to use document.execCommand() later while still being in the click handler
           data: {
             longUrl: window.location.href,
             access_token: "48ecf90304d70f30729abe82dfea1dd8a11c4584",
             format: "json"
           },
-          success: function (response) {
-            var longUrl = Object.keys(response.results)[0];
-            var shortUrl = response.results[longUrl].shortUrl;
-            $this.parents(".permalink-control")
-              .find("input")
-              .show()
-              .val(shortUrl)
-              .focus();
-          }
         });
+        var longUrl = Object.keys(response.results)[0];
+        var shortUrl = response.results[longUrl].shortUrl;
+        $this.parents(".permalink-control")
+          .find("input")
+          .show()
+          .val(shortUrl)
+          .focus();
+        document.execCommand("copy");
       });
   });
 
